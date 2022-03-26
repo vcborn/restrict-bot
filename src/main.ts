@@ -1,5 +1,6 @@
 import { Message, Client } from 'discord.js'
 import dotenv from 'dotenv'
+import { toHiragana } from '@koozaki/romaji-conv'
 
 dotenv.config()
 
@@ -16,7 +17,7 @@ client.once('ready', () => {
 
 client.on('messageCreate', async (message: Message) => {
     if (message.author.bot) return
-    if (forbiddenWords.some(word => message.content.includes(word))) {
+    if (forbiddenWords.some(word => message.content.includes(word)) || forbiddenWords.some(word => toHiragana(message.content).toLowerCase().includes(toHiragana(word).toLowerCase()))) {
         message.delete();
     }
 })
