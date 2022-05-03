@@ -43,20 +43,20 @@ client.on('messageCreate', async (message: Message) => {
     if (message.author.bot) return
     const sheet = doc.sheetsByIndex[0]
     const rows = await sheet.getRows()
-    let check = false
-    rows.map(async row => {
-        if (row.id === message.author.id) {
-            check = true
-            row.count = (Number(row.count) + 1).toString()
-            await row.save()
-        }
-    })
-    if (!check) {
-        const addrow = await sheet.addRow({ id: message.author.id, name: message.author.username, count: 1 });
-    }
     const kana = await kuroshiro.convert(message.content, { to: "hiragana" })
     if (forbiddenWords.some(word => message.content.includes(word)) || (fbKana.some(word => toHiragana(moji(kana).convert("HK", "ZK").toString()).toLowerCase().replace(/\r\n/g, '').trim().includes(word) && kbIgnore.some(ignore => ignore !== word)))) {
         message.delete();
+        let check = false
+        rows.map(async row => {
+            if (row.id === message.author.id) {
+                check = true
+                row.count = (Number(row.count) + 1).toString()
+                await row.save()
+            }
+        })
+        if (!check) {
+            const addrow = await sheet.addRow({ id: message.author.id, name: message.author.username, count: 1 });
+        }
     }
 })
 
