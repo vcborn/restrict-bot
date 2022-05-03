@@ -10,7 +10,7 @@ dotenv.config()
 const kuroshiro = new Kuroshiro()
 
 const forbiddenWords = ["ちんこ" , "セックス" , "イラマチオ" , "フェラ" , "クンニ" , "ペニバン" , "ペニスバンド" , "ダッチワイフ" , "青姦" , "レイプ" , "兜合わせ" , "パイズリ" , "手コキ" , "オナニー" , "ハメ撮り" , "おっぱい" , "まんこ" , "おなほ" , "SEX" ,"し↓こ↑し↓こ↑", "ペニス" , "オナホ", "潮吹き", "強姦","シコシコ", "自慰", "自慰行為", "カーせっくす" ,"しこっ", "porn", "xvideo", "sharevideo"];
-const kbIgnore = ["自慰"]
+const kbIgnore = ["じい"]
 
 let fbKana: string[] = []
 
@@ -30,13 +30,12 @@ client.once('ready', async () => {
     }
     console.log('Ready!')
     console.log(client.user?.tag)
-    console.log(fbKana)
 })
 
 client.on('messageCreate', async (message: Message) => {
     if (message.author.bot) return
     const kana = await kuroshiro.convert(message.content, { to: "hiragana" })
-    if (forbiddenWords.some(word => message.content.includes(word)) || (kbIgnore.some !== fbKana.some && fbKana.some(word => toHiragana(moji(kana).convert("HK", "ZK").toString()).toLowerCase().includes(word)))) {
+    if (forbiddenWords.some(word => message.content.includes(word)) || (fbKana.some(word => toHiragana(moji(kana).convert("HK", "ZK").toString()).toLowerCase().includes(word) && kbIgnore.some(ignore => ignore !== word)))) {
         message.delete();
     }
 })
