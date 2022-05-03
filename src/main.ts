@@ -4,8 +4,13 @@ import Kuroshiro from "kuroshiro"
 import KuromojiAnalyzer from "kuroshiro-analyzer-kuromoji"
 import { toHiragana } from "@koozaki/romaji-conv"
 import moji from "moji"
+import { GoogleSpreadsheet } from 'google-spreadsheet'
+import fs from "fs"
+const doc = new GoogleSpreadsheet('1shvO1aDoGm-o7_miuE9L23ulYIDxPN_FF6rjhqC8in4');
 
 dotenv.config()
+
+const cred = JSON.parse(fs.readFileSync('./cred.json', 'utf8'));
 
 const kuroshiro = new Kuroshiro()
 
@@ -19,6 +24,8 @@ const client = new Client({
 })
 
 client.once('ready', async () => {
+    await doc.useServiceAccountAuth(cred);
+    await doc.loadInfo();
     await kuroshiro.init(new KuromojiAnalyzer());
     for (const x of forbiddenWords) {
         if( !x.match(/^[a-zA-Z0-9]+$/) ){
@@ -34,8 +41,21 @@ client.once('ready', async () => {
 
 client.on('messageCreate', async (message: Message) => {
     if (message.author.bot) return
+    const sheet = doc.sheetsByIndex[0]
+    const rows = await sheet.getRows()
+    let check = false
+    rows.map(async row => {
+        if (row.id === message.author.id) {
+            check = true
+            row.count = (Number(row.count) + 1).toString()
+            await row.save()
+        }
+    })
+    if (!check) {
+        const addrow = await sheet.addRow({ id: message.author.id, name: message.author.username, count: 1 });
+    }
     const kana = await kuroshiro.convert(message.content, { to: "hiragana" })
-    if (forbiddenWords.some(word => message.content.includes(word)) || (fbKana.some(word => toHiragana(moji(kana).convert("HK", "ZK").toString()).toLowerCase().includes(word) && kbIgnore.some(ignore => ignore !== word)))) {
+    if (forbiddenWords.some(word => message.content.includes(word)) || (fbKana.some(word => toHiragana(moji(kana).convert("HK", "ZK").toString()).toLowerCase().replace(/\r\n/g, '').trim().includes(word) && kbIgnore.some(ignore => ignore !== word)))) {
         message.delete();
     }
 })
