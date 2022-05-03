@@ -22,16 +22,17 @@ client.once('ready', async () => {
     await kuroshiro.init(new KuromojiAnalyzer());
     for (const x of forbiddenWords) {
         const fbtemp = await kuroshiro.convert(x, { to: "hiragana" })
-        fbKana.push(toHiragana(fbtemp))
+        fbKana.push(toHiragana(moji(fbtemp).convert("HK", "ZK").toString()).toLowerCase())
     }
     console.log('Ready!')
     console.log(client.user?.tag)
+    console.log(fbKana)
 })
 
 client.on('messageCreate', async (message: Message) => {
     if (message.author.bot) return
     const kana = await kuroshiro.convert(message.content, { to: "hiragana" })
-    if (forbiddenWords.some(word => message.content.includes(word)) || (kbIgnore.some !== fbKana.some && fbKana.some(word => toHiragana(moji(kana).convert("HK", "ZK").toString()).toLowerCase().includes(word.toLowerCase())))) {
+    if (forbiddenWords.some(word => message.content.includes(word)) || (kbIgnore.some !== fbKana.some && fbKana.some(word => toHiragana(moji(kana).convert("HK", "ZK").toString()).toLowerCase().includes(word)))) {
         message.delete();
     }
 })
