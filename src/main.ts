@@ -21,8 +21,12 @@ const client = new Client({
 client.once('ready', async () => {
     await kuroshiro.init(new KuromojiAnalyzer());
     for (const x of forbiddenWords) {
-        const fbtemp = await kuroshiro.convert(x, { to: "hiragana" })
-        fbKana.push(toHiragana(moji(fbtemp).convert("HK", "ZK").toString()).toLowerCase())
+        if( !x.match(/^[a-zA-Z0-9]+$/) ){
+            const fbtemp = await kuroshiro.convert(x, { to: "hiragana" })
+            fbKana.push(toHiragana(moji(fbtemp).convert("HK", "ZK").toString()).toLowerCase())
+        } else {
+            fbKana.push(x.toLowerCase())
+        }   
     }
     console.log('Ready!')
     console.log(client.user?.tag)
