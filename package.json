@@ -19,9 +19,11 @@
   "dependencies": {
     "@koozaki/romaji-conv": "^2.0.17",
     "@types/koozaki__romaji-conv": "^2.0.0",
+    "@types/moji": "^0.5.0",
     "discord.js": "^13.6.0",
     "dotenv": "^16.0.0",
     "kuroshiro": "github:opera7133/kuroshiro",
-    "kuroshiro-analyzer-kuromoji": "github:opera7133/kuroshiro-analyzer-kuromoji"
+    "kuroshiro-analyzer-kuromoji": "github:opera7133/kuroshiro-analyzer-kuromoji",
+    "moji": "^0.5.1"
   }
 }
