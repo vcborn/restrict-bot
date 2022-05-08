@@ -2,7 +2,6 @@ import { Message, Client } from 'discord.js'
 import dotenv from 'dotenv'
 import Kuroshiro from "kuroshiro"
 import KuromojiAnalyzer from "kuroshiro-analyzer-kuromoji"
-import { toHiragana } from "@koozaki/romaji-conv"
 import moji from "moji"
 import { GoogleSpreadsheet } from 'google-spreadsheet'
 import fs from "fs"
@@ -43,7 +42,7 @@ client.once('ready', async () => {
             // 漢字をひらがなに変換
             const fbtemp = await kuroshiro.convert(x, { to: "hiragana" })
             // 半角カナを全角カナに変換、カタカナをひらがなに変換、大文字を小文字にしてリストに追加
-            fbKana.push(toHiragana(moji(fbtemp).convert("HK", "ZK").toString()).toLowerCase())
+            fbKana.push(moji(fbtemp).convert("HK", "ZK").toString().toLowerCase())
         } else {
             // 大文字を小文字にしてリストに追加
             fbKana.push(x.toLowerCase())
@@ -65,10 +64,20 @@ client.on('messageCreate', async (message: Message) => {
     // メッセージの漢字をひらがなに変換
     const kana = await kuroshiro.convert(message.content, { to: "hiragana" })
     // kanaの半角カナを全角カナに変換、カタカナをひらがなに変換、大文字を小文字に変換、改行コードを削除、全角空白を削除、空白を削除
-    const converted =  toHiragana(moji(kana).convert("HK", "ZK").toString()).toLowerCase().replace(/\r\n/g, '').replace(/\s+/g,'').trim();
+    const converted =  moji(kana).convert("HK", "ZK").toString().toLowerCase().replace(/\r\n/g, '').replace(/\s+/g,'').trim();
     // もしforbiddenWordsの適当な文字がメッセージに含まれていたら
     // または convertedがメッセージに含まれているまたは各文字の間にa-zの記号が入っている、なおかつkbIgnoreに含まれていなかったら
-    if (forbiddenWords.some(word => message.content.toLowerCase().includes(word)) || (fbKana.some(word => (converted.includes(word) || new RegExp(word.slice(0, -1).replace(/([a-zぁ-んァ-ヶｱ-ﾝﾞﾟ一-龠])/g, "$1[^a-zぁ-んァ-ヶｱ-ﾝﾞﾟ一-龠]*") + word.slice(-1)).test(converted)) && kbIgnore.some(ignore => ignore !== word)))) {
+    const judge = forbiddenWords.some(word => message.content.toLowerCase().includes(word)) || (fbKana.some((word) => {
+        if (converted.includes(word)) {
+            console.log(message.content, converted, word, 0);
+            return true;
+        }
+        if ((new RegExp(word.slice(0, -1).replace(/([a-zぁ-んァ-ヶｱ-ﾝﾞﾟ一-龠])/g, "$1[^a-zぁ-んァ-ヶｱ-ﾝﾞﾟ一-龠]*") + word.slice(-1)).test(converted)) && kbIgnore.some(ignore => ignore !== word)) {
+            console.log(message.content, converted, word, 1);
+            return true;
+        }
+    }));
+    if (judge) {
         // メッセージを削除
         message.delete();
         // チェックをfalseに
@@ -106,10 +115,20 @@ client.on('messageUpdate', async (oldMessage, newMessage) => {
         // メッセージの漢字をひらがなに変換
         const kana = await kuroshiro.convert(newMessage.content, { to: "hiragana" })
         // kanaの半角カナを全角カナに変換、カタカナをひらがなに変換、大文字を小文字に変換、改行コードを削除、全角空白を削除、空白を削除
-        const converted =  toHiragana(moji(kana).convert("HK", "ZK").toString()).toLowerCase().replace(/\r\n/g, '').replace(/\s+/g,'').trim();
+        const converted = moji(kana).convert("HK", "ZK").toString().toLowerCase().replace(/\r\n/g, '').replace(/\s+/g,'').trim();
         // もしforbiddenWordsの適当な文字がメッセージに含まれていたら
         // または convertedがメッセージに含まれているまたは各文字の間にa-zの記号が入っている、なおかつkbIgnoreに含まれていなかったら
-        if (forbiddenWords.some(word => message.toLowerCase().includes(word)) || (fbKana.some(word => (converted.includes(word) || new RegExp(word.slice(0, -1).replace(/([a-zぁ-んァ-ヶｱ-ﾝﾞﾟ一-龠])/g, "$1[^a-zぁ-んァ-ヶｱ-ﾝﾞﾟ一-龠]*") + word.slice(-1)).test(converted)) && kbIgnore.some(ignore => ignore !== word)))) {
+        const judge = forbiddenWords.some(word => message.toLowerCase().includes(word)) || (fbKana.some((word) => {
+            if (converted.includes(word)) {
+                console.log(message, converted, word, 0);
+                return true;
+            }
+            if ((new RegExp(word.slice(0, -1).replace(/([a-zぁ-んァ-ヶｱ-ﾝﾞﾟ一-龠])/g, "$1[^a-zぁ-んァ-ヶｱ-ﾝﾞﾟ一-龠]*") + word.slice(-1)).test(converted)) && kbIgnore.some(ignore => ignore !== word)) {
+                console.log(message, converted, word, 1);
+                return true;
+            }
+        }));
+        if (judge) {
             // メッセージを削除
             newMessage.delete();
             // チェックをfalseに
