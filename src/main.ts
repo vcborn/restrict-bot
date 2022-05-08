@@ -109,7 +109,7 @@ client.on('messageUpdate', async (oldMessage, newMessage) => {
         const converted =  toHiragana(moji(kana).convert("HK", "ZK").toString()).toLowerCase().replace(/\r\n/g, '').replace(/\s+/g,'').trim();
         // もしforbiddenWordsの適当な文字がメッセージに含まれていたら
         // または convertedがメッセージに含まれているまたは各文字の間にa-zの記号が入っている、なおかつkbIgnoreに含まれていなかったら
-        if (forbiddenWords.some(word => message.toLowerCase().includes(word)) || (fbKana.some(word => (converted.includes(word) || new RegExp(word.slice(0, -1).replace(/([a-zぁ-んァ-ヶｱ-ﾝﾞﾟ一-龠])/g, "$1[^a-z]*") + word.slice(-1)).test(converted)) && kbIgnore.some(ignore => ignore !== word)))) {
+        if (forbiddenWords.some(word => message.toLowerCase().includes(word)) || (fbKana.some(word => (converted.includes(word) || new RegExp(word.slice(0, -1).replace(/([a-zぁ-んァ-ヶｱ-ﾝﾞﾟ一-龠])/g, "$1[^a-zぁ-んァ-ヶｱ-ﾝﾞﾟ一-龠]*") + word.slice(-1)).test(converted)) && kbIgnore.some(ignore => ignore !== word)))) {
             // メッセージを削除
             newMessage.delete();
             // チェックをfalseに
