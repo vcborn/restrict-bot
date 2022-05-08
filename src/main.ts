@@ -44,7 +44,7 @@ client.on('messageCreate', async (message: Message) => {
     const sheet = doc.sheetsByIndex[0]
     const rows = await sheet.getRows()
     const kana = await kuroshiro.convert(message.content, { to: "hiragana" })
-    if (forbiddenWords.some(word => message.content.toLowerCase().includes(word)) || (fbKana.some(word => toHiragana(moji(kana).convert("HK", "ZK").toString()).toLowerCase().replace(/\r\n/g, '').trim().includes(word) && kbIgnore.some(ignore => ignore !== word)))) {
+    if (forbiddenWords.some(word => message.content.toLowerCase().includes(word)) || (fbKana.some(word => toHiragana(moji(kana).convert("HK", "ZK").toString()).toLowerCase().replace(/\r\n/g, '').replace(/\s+/g,'').trim().includes(word) && kbIgnore.some(ignore => ignore !== word)))) {
         message.delete();
         let check = false
         rows.map(async row => {
