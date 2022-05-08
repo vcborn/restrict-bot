@@ -69,6 +69,7 @@ client.on('messageCreate', async (message: Message) => {
     // もしforbiddenWordsの適当な文字がメッセージに含まれていたら
     // または convertedがメッセージに含まれているまたは各文字の間にa-zの記号が入っている、なおかつkbIgnoreに含まれていなかったら
     if (forbiddenWords.some(word => message.content.toLowerCase().includes(word)) || (fbKana.some(word => (converted.includes(word) || new RegExp(word.slice(0, -1).replace(/([a-zぁ-んァ-ヶｱ-ﾝﾞﾟ一-龠])/g, "$1[^a-z]*") + word.slice(-1)).test(converted)) && kbIgnore.some(ignore => ignore !== word)))) {
+        console.log(message.content);
         // メッセージを削除
         message.delete();
         // チェックをfalseに
@@ -110,6 +111,7 @@ client.on('messageUpdate', async (oldMessage, newMessage) => {
         // もしforbiddenWordsの適当な文字がメッセージに含まれていたら
         // または convertedがメッセージに含まれているまたは各文字の間にa-zの記号が入っている、なおかつkbIgnoreに含まれていなかったら
         if (forbiddenWords.some(word => message.toLowerCase().includes(word)) || (fbKana.some(word => (converted.includes(word) || new RegExp(word.slice(0, -1).replace(/([a-zぁ-んァ-ヶｱ-ﾝﾞﾟ一-龠])/g, "$1[^a-z]*") + word.slice(-1)).test(converted)) && kbIgnore.some(ignore => ignore !== word)))) {
+            console.log(message);
             // メッセージを削除
             newMessage.delete();
             // チェックをfalseに
