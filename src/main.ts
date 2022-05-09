@@ -68,11 +68,11 @@ client.on('messageCreate', async (message: Message) => {
     // もしforbiddenWordsの適当な文字がメッセージに含まれていたら
     // または convertedがメッセージに含まれているまたは各文字の間にa-zの記号が入っている、なおかつkbIgnoreに含まれていなかったら
     const judge = forbiddenWords.some(word => message.content.toLowerCase().includes(word)) || (fbKana.some((word) => {
-        if (converted.includes(word)) {
+        if (converted.includes(word) && kbIgnore.some(igword => igword !== word)) {
             console.log(message.content, converted, word, 0);
             return true;
         }
-        if ((new RegExp(word.slice(0, -1).replace(/([a-zぁ-んァ-ヶｱ-ﾝﾞﾟ一-龠])/g, "$1[^a-zぁ-んァ-ヶｱ-ﾝﾞﾟ一-龠]*") + word.slice(-1)).test(converted)) && kbIgnore.some(ignore => ignore !== word)) {
+        if ((new RegExp(word.slice(0, -1).replace(/([a-zぁ-んァ-ヶｱ-ﾝﾞﾟ一-龠])/g, "$1[^a-zぁ-んァ-ヶｱ-ﾝﾞﾟ一-龠]*") + word.slice(-1)).test(converted)) && kbIgnore.some(igword => igword !== word)) {
             console.log(message.content, converted, word, 1);
             return true;
         }
