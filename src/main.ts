@@ -57,10 +57,6 @@ client.once('ready', async () => {
 client.on('messageCreate', async (message: Message) => {
     // botの場合は無視
     if (message.author.bot) return
-    // 使用するシートを定義
-    const sheet = doc.sheetsByIndex[0]
-    // シートの行を取得
-    const rows = await sheet.getRows()
     // メッセージの漢字をひらがなに変換
     const kana = await kuroshiro.convert(message.content, { to: "hiragana" })
     // kanaの半角カナを全角カナに変換、カタカナをひらがなに変換、大文字を小文字に変換、改行コードを削除、全角空白を削除、空白を削除
@@ -80,24 +76,30 @@ client.on('messageCreate', async (message: Message) => {
     if (judge) {
         // メッセージを削除
         message.delete();
-        // チェックをfalseに
-        let check = false
-        // 行を探索
-        rows.map(async row => {
-            // 行のidがメッセージ送信者のidと一致したら
-            if (row.id === message.author.id) {
-                // チェックをtrueに
-                check = true
-                // 検閲回数を現在から1増やす
-                row.count = (Number(row.count) + 1).toString()
-                // 変更を保存
-                await row.save()
+        if (message.guild?.id === "814857779675529237") {
+            // チェックをfalseに
+            let check = false
+            // 使用するシートを定義
+            const sheet = doc.sheetsByIndex[0]
+            // シートの行を取得
+            const rows = await sheet.getRows()
+            // 行を探索
+            rows.map(async row => {
+                // 行のidがメッセージ送信者のidと一致したら
+                if (row.id === message.author.id) {
+                    // チェックをtrueに
+                    check = true
+                    // 検閲回数を現在から1増やす
+                    row.count = (Number(row.count) + 1).toString()
+                    // 変更を保存
+                    await row.save()
+                }
+            })
+            // もしチェックがfalseだったら
+            if (!check) {
+                // メッセージ送信者のid、名前、カウント回数の行を追加して保存
+                const addrow = await sheet.addRow({ id: message.author.id, name: message.author.username, count: 1 });
             }
-        })
-        // もしチェックがfalseだったら
-        if (!check) {
-            // メッセージ送信者のid、名前、カウント回数の行を追加して保存
-            const addrow = await sheet.addRow({ id: message.author.id, name: message.author.username, count: 1 });
         }
     }
 })
@@ -108,10 +110,7 @@ client.on('messageUpdate', async (oldMessage, newMessage) => {
         const author_id = newMessage.author.id;
         // botの場合は無視
         if (newMessage.author.bot) return
-        // 使用するシートを定義
-        const sheet = doc.sheetsByIndex[0]
-        // シートの行を取得
-        const rows = await sheet.getRows()
+        
         // メッセージの漢字をひらがなに変換
         const kana = await kuroshiro.convert(newMessage.content, { to: "hiragana" })
         // kanaの半角カナを全角カナに変換、カタカナをひらがなに変換、大文字を小文字に変換、改行コードを削除、全角空白を削除、空白を削除
@@ -131,24 +130,30 @@ client.on('messageUpdate', async (oldMessage, newMessage) => {
         if (judge) {
             // メッセージを削除
             newMessage.delete();
-            // チェックをfalseに
-            let check = false
-            // 行を探索
-            rows.map(async row => {
-                // 行のidがメッセージ送信者のidと一致したら
-                if (row.id === author_id) {
-                    // チェックをtrueに
-                    check = true
-                    // 検閲回数を現在から1増やす
-                    row.count = (Number(row.count) + 1).toString()
-                    // 変更を保存
-                    await row.save()
+            if (newMessage.guild?.id === "814857779675529237") {
+                // チェックをfalseに
+                let check = false
+                // 使用するシートを定義
+                const sheet = doc.sheetsByIndex[0]
+                // シートの行を取得
+                const rows = await sheet.getRows()
+                // 行を探索
+                rows.map(async row => {
+                    // 行のidがメッセージ送信者のidと一致したら
+                    if (row.id === author_id) {
+                        // チェックをtrueに
+                        check = true
+                        // 検閲回数を現在から1増やす
+                        row.count = (Number(row.count) + 1).toString()
+                        // 変更を保存
+                        await row.save()
+                    }
+                })
+                // もしチェックがfalseだったら
+                if (!check) {
+                    // メッセージ送信者のid、名前、カウント回数の行を追加して保存
+                    const addrow = await sheet.addRow({ id: author_id, name: newMessage.author.username, count: 1 });
                 }
-            })
-            // もしチェックがfalseだったら
-            if (!check) {
-                // メッセージ送信者のid、名前、カウント回数の行を追加して保存
-                const addrow = await sheet.addRow({ id: author_id, name: newMessage.author.username, count: 1 });
             }
         }
     }
