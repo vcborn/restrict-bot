@@ -9,8 +9,8 @@
     "compile": "tsc -p ."
   },
   "keywords": [],
-  "author": "",
-  "license": "ISC",
+  "author": "VCborn",
+  "license": "WTFPL",
   "devDependencies": {
     "@types/google-spreadsheet": "^3.2.1",
     "eslint": "^8.12.0",
