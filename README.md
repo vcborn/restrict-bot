@@ -12,7 +12,7 @@ Discord bot to censor bad words.
 ### Setup metrics (optional)
 1. Enable "Google Drive API" and "Google Sheets API" from Google Cloud Console
 2. Create service account and download credentials in json format
-3. Save the file as cred.json in the project root
+3. Save the file as `config/cred.json`
 4. Be sure to fill `sheet_id`
 
 ## License
