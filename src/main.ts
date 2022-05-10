@@ -7,9 +7,6 @@ import fs from "fs"
 import config from 'config'
 const doc = new GoogleSpreadsheet(config.get('sheet_id'))
 
-// Google Drive APIの資格情報を読み込み
-const cred = JSON.parse(fs.readFileSync('./config/cred.json', 'utf8'))
-
 // Kuroshiroを定義
 const kuroshiro = new Kuroshiro()
 
@@ -27,6 +24,8 @@ const client = new Client({
 // ready状態
 client.once('ready', async () => {
     if (config.get('sheet_id')) {
+        // Google Drive APIの資格情報を読み込み
+        const cred = JSON.parse(fs.readFileSync('./config/cred.json', 'utf8'))
         // API認証
         await doc.useServiceAccountAuth(cred);
         // ドキュメントを読み込み
