@@ -1,0 +1,17 @@
+{
+    "token": "",
+    "app_id": "",
+    // https://docs.google.com/spreadsheets/d/[Here is the ID]/edit...
+    // No statistics if left blank
+    "sheet_id": "",
+    // If the server ID is below, count the number of deletions
+    // If left blank, all installed servers will be counted
+    "count_guild": "",
+    "words": {
+        // Messages to be restricted
+        "target": [""],
+        
+        // Ignored if the target, even if it is a target, is the following character
+        "ignore": [""]
+    }
+}

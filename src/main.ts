@@ -1,25 +1,22 @@
 import { Message, Client } from 'discord.js'
-import dotenv from 'dotenv'
 import Kuroshiro from "kuroshiro"
 import KuromojiAnalyzer from "kuroshiro-analyzer-kuromoji"
 import moji from "moji"
 import { GoogleSpreadsheet } from 'google-spreadsheet'
 import fs from "fs"
-const doc = new GoogleSpreadsheet('1shvO1aDoGm-o7_miuE9L23ulYIDxPN_FF6rjhqC8in4');
-
-// .envを読み込み
-dotenv.config()
+import config from 'config'
+const doc = new GoogleSpreadsheet(config.get('sheet_id'))
 
 // Google Drive APIの資格情報を読み込み
-const cred = JSON.parse(fs.readFileSync('./cred.json', 'utf8'));
+const cred = JSON.parse(fs.readFileSync('./config/cred.json', 'utf8'))
 
 // Kuroshiroを定義
 const kuroshiro = new Kuroshiro()
 
 // 検閲リスト
-const forbiddenWords = ["ちんこ", "セックス", "イラマチオ", "フェラ", "クンニ", "ペニバン", "ペニスバンド", "ダッチワイフ", "青姦", "レイプ", "兜合わせ", "パイズリ", "手コキ", "オナニー", "ハメ撮り", "おっぱい", "まんこ", "おなほ", "SEX", "し↓こ↑し↓こ↑", "ペニス", "オナホ", "潮吹き", "強姦", "シコシコ", "自慰", "自慰行為", "カーせっくす" ,"しこっ", "シコる", "porn", "xvideo", "sharevideo"];
+const forbiddenWords: Array<string> = config.get('words.target')
 // 変換後に含まれていた場合無視する単語
-const kbIgnore = ["じい"]
+const kbIgnore: Array<string> = config.get('words.ignore')
 // 検閲リスト（ひらがな）を定義
 let fbKana: string[] = []
 
@@ -29,10 +26,12 @@ const client = new Client({
 
 // ready状態
 client.once('ready', async () => {
-    // API認証
-    await doc.useServiceAccountAuth(cred);
-    // ドキュメントを読み込み
-    await doc.loadInfo();
+    if (config.get('sheet_id')) {
+        // API認証
+        await doc.useServiceAccountAuth(cred);
+        // ドキュメントを読み込み
+        await doc.loadInfo();
+    }
     // Kuroshiroを初期化
     await kuroshiro.init(new KuromojiAnalyzer());
     // 検閲リストをひらがなに変換
@@ -76,7 +75,7 @@ client.on('messageCreate', async (message: Message) => {
     if (judge) {
         // メッセージを削除
         message.delete();
-        if (message.guild?.id === "814857779675529237") {
+        if (config.get("sheet_id") && (message.guild?.id === config.get('count_guild') || !config.get('count_guild'))) {
             // チェックをfalseに
             let check = false
             // 使用するシートを定義
@@ -130,7 +129,7 @@ client.on('messageUpdate', async (oldMessage, newMessage) => {
         if (judge) {
             // メッセージを削除
             newMessage.delete();
-            if (newMessage.guild?.id === "814857779675529237") {
+            if (config.get("sheet_id") && (newMessage.guild?.id === config.get('count_guild') || !config.get('count_guild'))) {
                 // チェックをfalseに
                 let check = false
                 // 使用するシートを定義
@@ -159,4 +158,4 @@ client.on('messageUpdate', async (oldMessage, newMessage) => {
     }
 })
 
-client.login(process.env.TOKEN)
+client.login(config.get('token'))

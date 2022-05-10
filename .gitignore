@@ -1,4 +1,5 @@
 build
 node_modules
 .env
-cred.json
+config/cred.json
+config/default.json5
